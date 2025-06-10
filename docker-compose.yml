@@ -1,0 +1,38 @@
+version: '3.8'
+
+networks:
+  soil-net:
+    external: true
+
+services:
+  postgres:
+    image: postgres:15 # Escolhido pela confiabilidade e suporte da versão
+    container_name: my-postgres
+    networks:
+      - soil-net
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: soil
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    build: .
+    container_name: nest-backend
+    depends_on:
+      - postgres
+    networks:
+      - soil-net
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgresql://admin:admin@postgres:5432/soil
+
+volumes:
+  pgdata:

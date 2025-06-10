@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Farm {
+  id     Int     @id @default(autoincrement())
+  name   String
+  pivots Pivot[]
+}
+
+model Pivot {
+  id        Int      @id @default(autoincrement())
+  name      String
+  status    String
+  direction String?
+  speed     Float?
+  pressure  Float?
+  farmId    Int
+  farm      Farm     @relation(fields: [farmId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  history   PivotStatusHistory[]
+}
+
+model PivotStatusHistory {
+  id        Int      @id @default(autoincrement())
+  pivotId   Int
+  pivot     Pivot    @relation(fields: [pivotId], references: [id])
+  status    String
+  direction String?
+  speed     Float?
+  pressure  Float?
+  timestamp DateTime @default(now())
+}
